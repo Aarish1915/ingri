@@ -48,6 +48,7 @@ jobs:
       run: npx prisma db push
       env:
         DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        DIRECT_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
       
     - name: Run Automated Test Suite
       run: npm test
