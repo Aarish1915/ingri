@@ -1,0 +1,29 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aws-backend
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Run Tests
+        run: npm test -- --passWithNoTests
+        
+      - name: Check Secrets Safety
+        run: |
+          if [ "$RAZORPAY_KEY_SECRET" == "dummy_key_secret" ]; then
+            echo "Error: RAZORPAY_KEY_SECRET must not be a dummy value in CI!"
+            exit 1
+          fi
+        env:
+          RAZORPAY_KEY_SECRET: ${{ secrets.RAZORPAY_KEY_SECRET }}

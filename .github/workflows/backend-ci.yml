@@ -1,0 +1,41 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main, "feature/*" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./aws-backend
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        # Note: npm cache requires package-lock.json to exist in the working directory
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Generate Prisma Client
+      run: npx prisma generate
+      
+    - name: Run Automated Test Suite
+      run: npm test
+      env:
+        # Mock environment variables for testing logic in isolation
+        NODE_ENV: test
+        RAZORPAY_KEY_ID: dummy_key_id
+        RAZORPAY_KEY_SECRET: dummy_key_secret
+        DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        DIRECT_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
